@@ -1,0 +1,37 @@
+diff --git a/base/run_level.cc b/base/run_level.cc
+index 53edf67..163b15e 100755
+--- a/base/run_level.cc
++++ b/base/run_level.cc
+@@ -277,32 +277,6 @@ RunLevel::RunLevelType RunLevel::GetRunLevel(RunLevel::RequestType type) {
+ #else
+ 
+   // Linux or Mac
+-  if (type == SERVER || type == RENDERER) {
+-    if (::geteuid() == 0) {
+-      // This process is started by root, or the executable is setuid to root.
+-
+-      // TODO(yusukes): It would be better to add 'SAFE' run-level which
+-      //  prohibits all mutable operations to local resources and return the
+-      //  level after calling chroot("/somewhere/safe"), setgid("nogroup"),
+-      //  and setuid("nobody") here. This is because many novice Linux users
+-      //  tend to login to their desktop as root.
+-
+-      return RunLevel::DENY;
+-    }
+-    if (::getuid() == 0) {
+-      // The executable is setuided to non-root and is started by root user?
+-      // This is unexpected. Returns DENY.
+-      return RunLevel::DENY;
+-    }
+-    return RunLevel::NORMAL;
+-  }
+-
+-  // type is 'CLIENT'
+-  if (::geteuid() == 0 || ::getuid() == 0) {
+-    // When mozc.so is loaded into a privileged process, deny clients to use
+-    // dictionary_tool and config_dialog.
+-    return RunLevel::DENY;
+-  }
+ 
+   return RunLevel::NORMAL;
+ 
